@@ -34,8 +34,8 @@ interface=args.interface
 
 class Device():
     def __init__(self, name="", MAC=""):
-	self.name= name
-	self.MAC= MAC
+        self.name= name
+        self.MAC= MAC
 
 class Packet():
     def __init__(self, name="", MAC="", oui="", vendor="", message_type="", 
@@ -79,18 +79,17 @@ def extract_data(traffic,oui_map):
     subnet= "unavailable"
     gw= "unavailable"
     DNS_addr= "unavailable"
-	
     # when DHCP packet found find message type, and hostname
-    # search DHCP options for message type, requested IP address, 
+    # search DHCP options for message type, requested IP address,
     # hostname, subnet mask, router, DNS
-    for info in traffic[0][DHCP].options:	
-	if isinstance(info,tuple):
+    for info in traffic[0][DHCP].options:
+	    if isinstance(info,tuple):
 
 	    # if reg key value pair
-            if len(info)== 2:
-		option,value= info
+        if len(info)== 2:
+            option,value= info
 
-	    # key value pair with two values		
+	    # key value pair with two values
 	    else:
 	        option, value, alt_value= info
 
@@ -128,7 +127,6 @@ def is_server(packet, dhcp_message):
         return True
     else:
         return False
-    
 
 
 def oui_lookup(oui_map, oui_id):
@@ -137,31 +135,31 @@ def oui_lookup(oui_map, oui_id):
     # the vendor will be reported as: "Series([], Name: companyName, dtype: object"
     vendor= oui_map.loc[oui_map['oui'].isin([oui_id])]['companyName']
     for val in vendor.values:
-	vendor= val
+	    vendor= val
 
     return vendor
 
 
 def format_data(packet,dhcp_message,time):
-    # Format data based on message type 
+    # Format data based on message type
     # if message is type Request, print IP info too
     if (packet.message_type == list(dhcp_message.keys())
-        [list(dhcp_message.values()).index("Request")] 
+        [list(dhcp_message.values()).index("Request")]
         and packet.requested_ip is not "unavailable"):
         dhcp_info= "{}: {} {} {} ({}) requested IP: {}".format(
-                    time, dhcp_message[packet.message_type], packet.name, 
+                    time, dhcp_message[packet.message_type], packet.name,
                     packet.MAC, packet.vendor, packet.requested_ip)
 
     # if message is type ACK, print subnet mask, gateway, and DNS info too
     elif( packet.message_type== list(dhcp_message.keys())
         [list(dhcp_message.values()).index("ACK")]):
         dhcp_info= "{}: {} {} {} ({})\nsubnet: {} default_GW: {} DNS: {}".format(
-                    time, dhcp_message[packet.message_type], packet.name, 
-                    packet.MAC,	packet.vendor, packet.subnet_mask, packet.gateway, packet.DNS)		
+                    time, dhcp_message[packet.message_type], packet.name,
+                    packet.MAC,	packet.vendor, packet.subnet_mask, packet.gateway, packet.DNS)
 
     else:
         dhcp_info= "{}: {} {} {} ({})".format(
-                    time, dhcp_message[packet.message_type], 
+                    time, dhcp_message[packet.message_type],
                     packet.name, packet.MAC, packet.vendor)
 
     return dhcp_info
@@ -176,7 +174,7 @@ def log(log_file, info):
 
 
 
-print "Listening on interface {}\nLogging to {}".format(interface, log_file)
+print ("Listening on interface {}\nLogging to {}".format(interface, log_file))
 
 
 while True:
@@ -186,7 +184,6 @@ while True:
             # listen on the interface for DHCP traffic
             traffic= sniff(iface=interface, filter="port 67 or port 68", count=1)
             dhcp_packet= extract_data(traffic,oui_map)
-            
             # Keep track of all seen devices
             all_devices= track_device(dhcp_packet,all_devices)
 
@@ -197,7 +194,7 @@ while True:
             dhcp_info= format_data(dhcp_packet, message_type, current_time)
 
             # "real time" display to terminal
-            print dhcp_info
+            print(dhcp_info)
 
             #log
             log(log_file, dhcp_info)
