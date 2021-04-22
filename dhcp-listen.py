@@ -83,22 +83,22 @@ def extract_data(traffic,oui_map):
     # search DHCP options for message type, requested IP address,
     # hostname, subnet mask, router, DNS
     for info in traffic[0][DHCP].options:
-	    if isinstance(info,tuple):
+        if isinstance(info,tuple):
 
-	    # if reg key value pair
-        if len(info)== 2:
-            option,value= info
+            # if reg key value pair
+            if len(info)== 2:
+                option,value= info
 
-	    # key value pair with two values
-	    else:
-	        option, value, alt_value= info
+            # key value pair with two values
+            else:
+                option, value, alt_value= info
 
-	    if option == "message-type": message= str(value)
-	    if option == "requested_addr": request_addr= str(value)
-	    if option == "hostname": hostname= value
-	    if option == "subnet_mask": subnet= value
-	    if option == "router": gw= value
-	    if option == "name_server": DNS_addr= value, alt_value
+            if option == "message-type": message= str(value)
+            if option == "requested_addr": request_addr= str(value)
+            if option == "hostname": hostname= value
+            if option == "subnet_mask": subnet= value
+            if option == "router": gw= value
+            if option == "name_server": DNS_addr= value, alt_value
 
     vend= oui_lookup(oui_map,oui_id)
     packet=Packet(name=hostname,MAC=MAC_addr,oui=oui_id, vendor=vend, message_type=message,
